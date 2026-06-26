@@ -106,7 +106,6 @@ public class SessionServiceController {
         // JSON from file to Object
         VirtualStudyData virtualStudyData =
             sessionServiceObjectMapper.readValue(body.toString(), VirtualStudyData.class);
-
         if (isAuthorized()) {
           String userName = userName();
           if (userName.equals(ALL_USERS)) {
@@ -119,8 +118,6 @@ public class SessionServiceController {
             virtualStudyData.setUsers(Collections.singleton(userName));
           }
         } else {
-          // Sanitize: anonymous users must not be able to inject arbitrary owner or users values
-          // into the session store. Force server-side defaults instead of trusting the payload.
           virtualStudyData.setOwner("anonymous");
           virtualStudyData.setUsers(new HashSet<>());
         }
@@ -147,9 +144,8 @@ public class SessionServiceController {
           customData.setOwner(userName());
           customData.setUsers(Collections.singleton(userName()));
         } else {
-          // Sanitize: anonymous users must not inject arbitrary owner or users values.
           customData.setOwner("anonymous");
-          customData.setUsers(new java.util.HashSet<>());
+          customData.setUsers(new HashSet<>());
         }
 
         // use basic authentication for session service if set
